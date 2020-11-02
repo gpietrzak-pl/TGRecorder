@@ -1,46 +1,49 @@
+import PySimpleGUI as sg
 import pyautogui
 import sys
-pyautogui.FAILSAFE = True
-j = 0
-i = 1
-screenWidth, screenHeight = pyautogui.size()
-while int(j) < 1:   
-    j = pyautogui.confirm(text='1 TO START      0 TO USTAWIENIE KURSORA', title='Autoclicker Telegram by Ares Neptuno', buttons=['1', '0'])
-    if int(j) < 1:
-        print('Kliknij Ctrl-C aby ustawić punkt.')
+
+sg.ChangeLookAndFeel('GreenTan')
+
+# ------ Menu Definition ------ #
+menu_def = [#['&File', '&Properties', '&Exit'],
+            ['&Help', '&About...'], ]
+
+layout = [  [sg.Menu(menu_def, tearoff=True)],
+            [sg.Button('Zapisz', enable_events=True), sg.Button('Nagrywaj', enable_events=True)] ]
+
+# Create the Window
+window = sg.Window('TgRecorder', layout)
+# Event Loop to process "events" and get the "values" of the inputs
+while True:
+    event, values = window.read()
+    if event in (sg.WIN_CLOSED, 'Quit', 'Exit'): # if user closes window or clicks cancel
+        break
+    if event.startswith('About'):
+        sg.Popup('For help: http://gpietrzak.pl/tgr')
+    if event.startswith('Zapisz'):
+        print("1. Kliknij w to okno")
+        print("2. Najedź kursorem na wybrane miejsce")
+        print("3. Kliknij Ctrl-C aby zapisać pozycję kursora.")
+        #TODO: how to get mouse position?
         try:
             while True:
                 x, y = pyautogui.position()
-                positionStr = 'X: ' + str(x).rjust(4) + ' Y: ' + str(y).rjust(4)
-                print(positionStr, end='')
-                print('\b' * len(positionStr), end='', flush=True)
+                positionStr = "X: " + str(x).rjust(4) + " Y: " + str(y).rjust(4)
+                print(positionStr, end="")
+                print('\b' * len(positionStr), end="", flush=True)
         except KeyboardInterrupt:
-            print('\n')
+            print('Zapisane!')
 
-        f = open("x.txt", "w")
-        f.write(str(x))
-        f.close()
-        f = open("y.txt", "w")
-        f.write(str(y))
+        f = open("config.cfg", "w")
+        f.write(str(x)+"\n"+str(y))
         f.close()
 
-       
-
- 
-while int(i) > 0:   
-    i = pyautogui.confirm(text='1 TO START      0 TO STOP', title='Autoclicker Telegram by Ares Neptuno', buttons=['1', '0'])
-    if int(i) > 0:
-        f = open('x.txt', 'r')
+    if event.startswith('Nagrywaj'):
+        f = open("config.cfg", "r")
         inputx = f.readline()
-        f.close()
-        print(inputx)
-        f = open('y.txt', 'r')
         inputy = f.readline()
         f.close()
-        print(inputy)
+
         pyautogui.moveTo(int(inputx), int(inputy)) 
         pyautogui.click(clicks=2)
-        pyautogui.mouseDown()    
-            
-
- 
+        pyautogui.mouseDown()
